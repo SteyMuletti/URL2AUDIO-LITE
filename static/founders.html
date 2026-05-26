@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Founders — URL2AUDIO</title>
+<meta name="description" content="Meet the people behind URL2AUDIO.">
+<link rel="icon" type="image/png" href="/static/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #753BBD;
+    --accent2: #9d4edd;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --card: #14141e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(117,59,189,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(117,59,189,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 60px;
+    background: rgba(10,10,15,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace; font-weight: 700;
+    font-size: 1.1rem; color: var(--accent);
+    letter-spacing: 0.05em; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-back {
+    background: rgba(117,59,189,0.12); border: 1px solid rgba(117,59,189,0.3);
+    color: var(--accent2) !important; padding: 7px 18px; border-radius: 6px;
+    font-size: 0.82rem !important; font-weight: 700;
+    transition: background 0.2s !important;
+  }
+  .nav-back:hover { background: rgba(117,59,189,0.22) !important; }
+
+  .page {
+    position: relative; z-index: 1;
+    max-width: 760px; margin: 0 auto;
+    padding: 72px 24px 80px; width: 100%;
+    flex: 1;
+  }
+
+  .page-eyebrow {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--accent2); letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800;
+    line-height: 1.1; margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .page-subtitle {
+    font-size: 1rem; color: var(--muted); line-height: 1.7;
+    max-width: 560px; margin-bottom: 64px;
+  }
+
+  .founders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+  }
+
+  .founder-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: border-color 0.25s;
+  }
+  .founder-card:hover { border-color: rgba(117,59,189,0.45); }
+
+  .founder-avatar {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(117,59,189,0.4);
+    margin-bottom: 20px;
+    flex-shrink: 0;
+  }
+
+  .founder-name {
+    font-size: 1.35rem; font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .founder-role {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    color: var(--accent2); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .founder-bio {
+    font-size: 0.92rem; color: var(--muted);
+    line-height: 1.75; flex: 1;
+    margin-bottom: 28px;
+  }
+
+  .founder-links {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+
+  .founder-link {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 8px 16px; border-radius: 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700;
+    text-decoration: none; transition: opacity 0.18s, transform 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .founder-link:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  .founder-link.soundcloud {
+    background: linear-gradient(135deg, #ff5500, #ff7a00);
+    color: #fff;
+  }
+  .founder-link.github {
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+    color: var(--text);
+  }
+
+  .divider {
+    height: 1px; background: var(--border);
+    margin: 64px 0;
+  }
+
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border); padding: 28px 40px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    font-family: 'Space Mono', monospace; font-size: 0.68rem; color: var(--muted);
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 600px) {
+    nav { padding: 0 20px; }
+    .page { padding: 48px 20px 60px; }
+    footer { padding: 24px 20px; flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">URL2AUDIO</a>
+  <div class="nav-links">
+    <a href="/terms">Terms</a>
+    <a href="/" class="nav-back">← Back to App</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-eyebrow">// The people behind it</div>
+  <h1>Founders</h1>
+  <p class="page-subtitle">URL2AUDIO was built out of a real need — fast, professional-grade audio processing without the middleman.</p>
+
+  <div class="founders-grid">
+
+    <!-- Founder 1 -->
+    <div class="founder-card">
+      <img
+        class="founder-avatar"
+        src="https://i1.sndcdn.com/avatars-000747299431-l98x5k-t500x500.jpg"
+        alt="$tey Muletti"
+      >
+      <div class="founder-name">$tey Muletti</div>
+      <div class="founder-role">Founder &amp; Artist</div>
+      <p class="founder-bio">
+        URL2AUDIO is my entire release workflow — from ripping reference tracks and detecting keys, to separating stems and opening everything straight in FL Studio. Every single release on my SoundCloud is produced, processed, and delivered completely in-house. No labels, no middlemen, no outsourcing. Just the tool, the DAW, and the music. I built this because I needed it, and now I ship it so other independent artists can move just as fast.
+      </p>
+      <div class="founder-links">
+        <a class="founder-link soundcloud" href="https://soundcloud.com/stey-muletti" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1.543 13.66c0 .193.15.35.338.35h.662l.314-1.502-.314-1.607H1.88c-.188 0-.338.157-.338.35v2.41zm2.34 1.29c0 .217.17.393.38.393h.732l.345-1.695-.345-1.81h-.733c-.21 0-.38.176-.38.393v2.72zm2.42.73c0 .24.192.435.43.435h.803l.378-2.42-.378-2.2h-.804c-.237 0-.43.195-.43.434v3.752zm2.45.47c0 .264.212.478.474.478h.875l.413-2.895-.413-2.59H9.227c-.262 0-.474.214-.474.478v4.529zm2.5.32c0 .29.232.524.52.524h.944l.45-3.344-.45-2.97h-.945c-.287 0-.52.235-.52.524v5.266zm2.55.16c0 .315.252.57.565.57h.97l.48-3.835-.48-3.35h-.97c-.313 0-.565.255-.565.57v6.046zm2.59.05c0 .34.273.617.61.617h1.02l.51-4.33-.51-3.73h-1.02c-.337 0-.61.277-.61.617v6.826zm2.62-.08c0 .366.294.663.657.663h1.065l.543-4.25-.543-4.01h-1.065c-.363 0-.657.297-.657.663v6.933zm2.65-.22c0 .39.315.708.703.708h1.11l.576-4.47-.576-4.27h-1.11c-.388 0-.703.318-.703.708v7.324z"/></svg>
+          SoundCloud
+        </a>
+      </div>
+    </div>
+
+    <!-- Founder 2 -->
+    <div class="founder-card">
+      <img
+        class="founder-avatar"
+        src="https://avatars.githubusercontent.com/u/169853256?v=4"
+        alt="Patrick Garcia"
+      >
+      <div class="founder-name">Patrick Garcia</div>
+      <div class="founder-role">Developer &amp; Drummer</div>
+      <p class="founder-bio">
+        Patrick is the engineer who made it all run. A full-stack developer and lifelong drummer, he architected the stem separation pipeline, built the desktop application framework from the ground up, and handled the system tuning and cross-platform compatibility that makes it work on Windows, macOS, and Linux without missing a beat. This project sits right at the crossroads of his two worlds, and he had a great time making them collide. Building something that actually helps artists make music faster is the kind of work that doesn't feel like work.
+      </p>
+      <div class="founder-links">
+        <a class="founder-link github" href="https://github.com/anomaloushuman" target="_blank" rel="noopener">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>&copy; 2025 URL2AUDIO</span>
+  <div style="display:flex;gap:20px;">
+    <a href="/terms">Terms of Service</a>
+    <a href="/founders">Founders</a>
+    <a href="/">App</a>
+  </div>
+</footer>
+
+</body>
+</html>

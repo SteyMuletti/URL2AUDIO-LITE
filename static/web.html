@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL2AUDIO — Free URL to MP3 Converter</title>
+<meta name="description" content="Convert any URL or audio file to MP3 instantly, free. Get the desktop app for stem separation, WAV/FLAC, key & BPM detection, and industry vocal chains.">
+<link rel="icon" type="image/png" href="/static/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #753BBD;
+    --accent2: #9d4edd;
+    --text: #e8e8f0;
+    --muted: #5a5a7a;
+    --error: #ff4d6d;
+    --success: #22c55e;
+    --card: #14141e;
+    --orange: #e86c00;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(117,59,189,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(117,59,189,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 60px;
+    background: rgba(10,10,15,0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Space Mono', monospace; font-weight: 700;
+    font-size: 1.1rem; color: var(--accent);
+    letter-spacing: 0.05em; text-decoration: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-cta {
+    background: var(--accent); color: #fff !important;
+    padding: 8px 20px; border-radius: 6px;
+    font-weight: 700; font-size: 0.82rem !important;
+    transition: background 0.2s, transform 0.15s !important;
+  }
+  .nav-cta:hover { background: var(--accent2) !important; transform: translateY(-1px); }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center; padding: 80px 24px 48px;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(117,59,189,0.15); border: 1px solid rgba(117,59,189,0.3);
+    border-radius: 999px; padding: 6px 16px;
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--accent2); margin-bottom: 28px; letter-spacing: 0.05em;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5.5vw, 4rem); font-weight: 800;
+    line-height: 1.12; margin-bottom: 20px;
+    background: linear-gradient(135deg, #fff 30%, var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero h1 span {
+    background: none;
+    -webkit-text-fill-color: var(--accent2);
+  }
+  .hero p {
+    font-size: 1.05rem; color: var(--muted);
+    max-width: 480px; margin: 0 auto 40px; line-height: 1.7;
+  }
+
+  /* CONVERTER */
+  .converter-wrap {
+    position: relative; z-index: 1;
+    max-width: 680px; margin: 0 auto 32px; padding: 0 20px;
+  }
+  .converter-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px;
+    box-shadow: 0 0 80px rgba(117,59,189,0.07);
+  }
+  .input-group { display: flex; gap: 10px; margin-bottom: 18px; }
+  .url-input {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Space Mono', monospace; font-size: 0.85rem;
+    padding: 12px 16px; outline: none; transition: border-color 0.2s;
+  }
+  .url-input:focus { border-color: var(--accent); }
+  .url-input::placeholder { color: var(--muted); }
+
+  .btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff; border: none; border-radius: 8px;
+    padding: 12px 24px; font-family: 'Space Mono', monospace;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    white-space: nowrap; letter-spacing: 0.03em;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .divider {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+    color: var(--muted); font-size: 0.78rem; font-family: 'Space Mono', monospace;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .upload-zone {
+    border: 1.5px dashed var(--border); border-radius: 10px;
+    padding: 24px 20px; text-align: center; cursor: pointer;
+    color: var(--muted); font-size: 0.85rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent); background: rgba(117,59,189,0.05); color: var(--text);
+  }
+  .upload-zone input { display: none; }
+  .upload-icon { font-size: 1.8rem; margin-bottom: 6px; }
+
+  .free-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25);
+    border-radius: 6px; padding: 4px 10px; font-size: 0.72rem;
+    color: var(--success); font-family: 'Space Mono', monospace; margin-top: 14px;
+  }
+
+  /* JOB STATUS */
+  #job-status { margin-top: 22px; display: none; }
+  .status-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0; animation: pulse 1.2s infinite;
+  }
+  .status-dot.done { background: var(--success); animation: none; }
+  .status-dot.error { background: var(--error); animation: none; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .status-text { font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--muted); flex: 1; }
+  .progress-bar { height: 3px; background: var(--border); border-radius: 999px; overflow: hidden; margin-bottom: 14px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; transition: width 0.3s; }
+
+  .action-btns { display: none; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .action-btns.show { display: flex; }
+
+  #result-stats { display: none; margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; }
+  .rs-track { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .rs-art { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+  .rs-track-label { font-family: 'Space Mono', monospace; font-size: 0.74rem; color: var(--muted); line-height: 1.5; }
+  .rs-grid { display: flex; gap: 28px; flex-wrap: wrap; }
+  .rs-stat { display: flex; flex-direction: column; gap: 4px; }
+  .rs-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
+  .rs-val.key   { color: var(--accent2); }
+  .rs-val.tempo { color: var(--accent2); }
+  .rs-label { font-size: 0.63rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'Space Mono', monospace; }
+
+  .dl-btn {
+    width: 100%; padding: 13px;
+    font-size: 0.88rem; text-align: center;
+  }
+  .error-msg { color: var(--error); font-family: 'Space Mono', monospace; font-size: 0.78rem; margin-top: 8px; display: none; }
+
+  /* SECTION */
+  .section { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 0 24px 80px; }
+  .section-label {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase;
+    text-align: center; margin-bottom: 10px;
+  }
+  .section h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); font-weight: 800; text-align: center; margin-bottom: 12px; }
+  .section-sub { text-align: center; color: var(--muted); font-size: 0.95rem; max-width: 560px; margin: 0 auto 44px; line-height: 1.6; }
+
+  /* ROLODEX CAROUSEL */
+  .carousel-outer {
+    position: relative; z-index: 1;
+    width: 100%; overflow: hidden;
+    padding: 8px 0 24px;
+    /* fade edges */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  }
+  .carousel-track {
+    display: flex;
+    gap: 14px;
+    width: max-content;
+    animation: rolodex-scroll 90s linear infinite;
+  }
+  .carousel-track:hover { animation-play-state: paused; }
+
+  @keyframes rolodex-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .chain-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 18px;
+    width: 200px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 12px;
+    cursor: default;
+    transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  }
+  .chain-card:hover {
+    border-color: rgba(117,59,189,0.6);
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(117,59,189,0.2);
+  }
+  .chain-card-name {
+    font-family: 'Space Mono', monospace; font-weight: 700;
+    font-size: 0.78rem; letter-spacing: 0.06em; line-height: 1.3;
+  }
+  .chain-card-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin-top: auto;
+  }
+  .chain-card-price { font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700; }
+  .chain-free-price { color: var(--success); }
+  .chain-paid-price { color: var(--muted); }
+
+  .chain-get-btn {
+    background: var(--success); color: #0a0a0f;
+    border: none; border-radius: 6px; padding: 5px 12px;
+    font-family: 'Space Mono', monospace; font-size: 0.68rem;
+    font-weight: 700; cursor: pointer; letter-spacing: 0.03em;
+    transition: opacity 0.2s; text-decoration: none; display: inline-block; white-space: nowrap;
+  }
+  .chain-get-btn:hover { opacity: 0.85; }
+  .chain-app-btn {
+    background: transparent; border: 1px solid rgba(117,59,189,0.35);
+    color: var(--accent2); border-radius: 6px; padding: 4px 10px;
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    font-weight: 700; cursor: pointer; letter-spacing: 0.03em;
+    transition: border-color 0.2s, background 0.2s; white-space: nowrap;
+  }
+  .chain-app-btn:hover { background: rgba(117,59,189,0.12); border-color: var(--accent2); }
+
+  .chains-cta {
+    text-align: center; padding: 24px; margin: 0 24px;
+    background: linear-gradient(135deg, #0f0f1f, #14101e);
+    border: 1px solid rgba(117,59,189,0.3); border-radius: 12px;
+  }
+  .chains-cta p { color: var(--muted); font-size: 0.88rem; margin-bottom: 16px; line-height: 1.6; }
+  .chains-loading { text-align: center; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.8rem; padding: 32px; }
+
+  /* COMPARE GRID */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 640px) {
+    .compare-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 20px; }
+    .hero { padding: 60px 20px 36px; }
+    .chain-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 420px) { .chain-grid { grid-template-columns: 1fr; } }
+
+  .tier-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+  .tier-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #0f0f1f 0%, #14101e 100%);
+    box-shadow: 0 0 40px rgba(117,59,189,0.15);
+  }
+  .tier-name { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .tier-card.featured .tier-name { color: var(--accent); }
+  .tier-price { font-size: 2.2rem; font-weight: 800; margin-bottom: 4px; }
+  .tier-price span { font-size: 0.95rem; font-weight: 400; color: var(--muted); }
+  .tier-sub { font-size: 0.82rem; color: var(--muted); margin-bottom: 24px; }
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 11px; margin-bottom: 28px; }
+  .feature-list li { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; }
+  .feature-list li .check { color: var(--success); flex-shrink: 0; }
+  .feature-list li .cross { color: var(--muted); flex-shrink: 0; }
+  .feature-list li.dim { color: var(--muted); }
+  .outline-btn {
+    width: 100%; padding: 12px; background: transparent;
+    border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
+    font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700;
+    cursor: default; letter-spacing: 0.03em; text-align: center;
+  }
+  .buy-btn { width: 100%; padding: 14px; font-size: 0.88rem; cursor: pointer; }
+
+  /* FL WORKFLOW BANNER */
+  .fl-banner {
+    position: relative; z-index: 1;
+    max-width: 680px; margin: 0 auto 60px; padding: 0 20px;
+  }
+  .fl-banner-inner {
+    background: linear-gradient(135deg, rgba(232,108,0,0.1), rgba(255,154,0,0.06));
+    border: 1px solid rgba(232,108,0,0.3);
+    border-radius: 14px; padding: 24px 28px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .fl-icon { font-size: 2.4rem; flex-shrink: 0; }
+  .fl-banner-text h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; color: #ff9a00; }
+  .fl-banner-text p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .fl-banner-text p strong { color: var(--text); }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border); padding: 28px 40px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 32px; color: var(--muted); font-size: 0.78rem;
+    font-family: 'Space Mono', monospace;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* Coming Soon modal */
+  .soon-overlay {
+    display: none; position: fixed; inset: 0; z-index: 700;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; padding: 24px;
+  }
+  .soon-overlay.open { display: flex; }
+  .soon-modal {
+    background: var(--card); border: 1px solid rgba(117,59,189,0.4);
+    border-radius: 20px; width: 100%; max-width: 420px;
+    padding: 44px 40px; text-align: center; position: relative;
+  }
+  .soon-icon { font-size: 2.4rem; margin-bottom: 16px; }
+  .soon-modal h2 {
+    font-size: 1.5rem; font-weight: 800; margin-bottom: 10px;
+  }
+  .soon-modal p {
+    font-family: 'Space Mono', monospace; font-size: 0.74rem;
+    color: var(--muted); line-height: 1.8; margin-bottom: 28px;
+  }
+  .soon-close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; color: var(--muted);
+    font-size: 1.2rem; cursor: pointer; line-height: 1;
+  }
+  .soon-close:hover { color: var(--text); }
+
+  /* Terms modal */
+  .terms-overlay {
+    display: none; position: fixed; inset: 0; z-index: 600;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+    align-items: flex-end; justify-content: center; padding: 24px;
+  }
+  .terms-overlay.open { display: flex; }
+  .terms-modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; width: 100%; max-width: 620px;
+    max-height: 80vh; overflow-y: auto; padding: 32px 36px;
+  }
+  .terms-modal h2 {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 700;
+    color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 20px;
+  }
+  .terms-modal h3 {
+    font-size: 0.82rem; font-weight: 700; color: var(--text); margin: 18px 0 6px;
+  }
+  .terms-modal p, .terms-modal li {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted); line-height: 1.85;
+  }
+  .terms-modal ul { padding-left: 18px; margin-top: 6px; }
+  .terms-modal li { margin-bottom: 4px; }
+  .terms-close {
+    float: right; background: none; border: none; color: var(--muted);
+    font-size: 1.2rem; cursor: pointer; line-height: 1; margin-top: -4px;
+  }
+  .terms-close:hover { color: var(--text); }
+
+  /* ── APP DEMO MODAL ─────────────────────────────────────────────────── */
+  .demo-overlay {
+    position: fixed; inset: 0; z-index: 900;
+    background: rgba(5,5,10,0.82);
+    backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .demo-overlay.open { display: flex; }
+
+  .demo-modal {
+    background: #111118;
+    border: 1px solid #1e1e2e;
+    border-radius: 20px;
+    width: 100%; max-width: 760px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.7);
+  }
+
+  .demo-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid #1e1e2e;
+    flex-shrink: 0;
+  }
+  .demo-header-left { display: flex; align-items: center; gap: 10px; }
+  .demo-badge {
+    background: rgba(117,59,189,0.18); border: 1px solid rgba(117,59,189,0.35);
+    color: #9d4edd; border-radius: 20px; padding: 3px 11px;
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .demo-title-text {
+    font-family: 'Space Mono', monospace; font-size: 0.85rem;
+    font-weight: 700; color: var(--text); letter-spacing: 0.04em;
+  }
+  .demo-close {
+    background: none; border: none; color: var(--muted);
+    font-size: 1.2rem; cursor: pointer; padding: 4px 8px;
+    border-radius: 6px; line-height: 1; transition: color 0.15s;
+  }
+  .demo-close:hover { color: var(--text); }
+
+  .demo-tabs {
+    display: flex; border-bottom: 1px solid #1e1e2e; flex-shrink: 0;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .demo-tabs::-webkit-scrollbar { display: none; }
+  .demo-tab {
+    flex-shrink: 0; padding: 12px 20px;
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); cursor: pointer; border: none; background: none;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .demo-tab.active { color: var(--text); border-bottom-color: var(--accent); }
+  .demo-tab:hover:not(.active) { color: var(--text); }
+
+  .demo-body { flex: 1; overflow-y: auto; padding: 28px 28px 0; }
+
+  .demo-screen { display: none; }
+  .demo-screen.active { display: block; }
+
+  /* shared demo widget styles */
+  .dw-card {
+    background: #14141e; border: 1px solid #1e1e2e;
+    border-radius: 12px; padding: 20px;
+    margin-bottom: 14px;
+  }
+  .dw-label {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .dw-stat-row {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  }
+  .dw-stat {
+    background: #0e0e18; border: 1px solid #1e1e2e; border-radius: 8px;
+    padding: 14px 12px; text-align: center;
+  }
+  .dw-stat-val {
+    font-family: 'Space Mono', monospace; font-size: 1.35rem; font-weight: 700;
+    color: #fff; margin-bottom: 4px;
+  }
+  .dw-stat-val.accent { color: #9d4edd; }
+  .dw-stat-val.orange { color: #e86c00; }
+  .dw-stat-key { font-size: 0.68rem; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .dw-progress {
+    height: 4px; background: #1e1e2e; border-radius: 99px; overflow: hidden; margin-bottom: 8px;
+  }
+  .dw-progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent), #9d4edd);
+    transition: width 1s ease;
+  }
+
+  .dw-stems { display: flex; flex-direction: column; gap: 10px; }
+  .dw-stem {
+    display: flex; align-items: center; gap: 12px;
+    background: #0e0e18; border: 1px solid #1e1e2e; border-radius: 8px; padding: 10px 14px;
+  }
+  .dw-stem-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dw-stem-name {
+    font-family: 'Space Mono', monospace; font-size: 0.75rem; font-weight: 700;
+    width: 64px; flex-shrink: 0;
+  }
+  .dw-stem-wave { flex: 1; height: 28px; display: flex; align-items: center; gap: 1px; }
+  .dw-stem-bar { width: 3px; border-radius: 2px; background: currentColor; opacity: 0.35; }
+  .dw-stem-ctrl {
+    display: flex; gap: 6px; flex-shrink: 0;
+  }
+  .dw-stem-btn {
+    background: #1e1e2e; border: 1px solid #2a2a3e; color: var(--muted);
+    border-radius: 5px; padding: 4px 9px;
+    font-family: 'Space Mono', monospace; font-size: 0.62rem; font-weight: 700;
+    cursor: not-allowed; opacity: 0.7;
+  }
+
+  .dw-fl-steps { display: flex; flex-direction: column; gap: 0; }
+  .dw-fl-step {
+    display: flex; align-items: flex-start; gap: 14px; padding: 14px 0;
+    border-bottom: 1px solid #1a1a28;
+  }
+  .dw-fl-step:last-child { border-bottom: none; }
+  .dw-step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(117,59,189,0.15); border: 1px solid rgba(117,59,189,0.3);
+    color: #9d4edd; font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    font-weight: 700; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .dw-step-body { flex: 1; }
+  .dw-step-title { font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; }
+  .dw-step-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+  .dw-step-demo-btn {
+    display: inline-block; margin-top: 8px;
+    background: rgba(232,108,0,0.12); border: 1px solid rgba(232,108,0,0.3);
+    color: #e86c00; border-radius: 6px; padding: 6px 14px;
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; font-weight: 700;
+    cursor: not-allowed; opacity: 0.7;
+  }
+
+  .dw-chain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  @media (max-width: 520px) { .dw-chain-grid { grid-template-columns: repeat(2, 1fr); } }
+  .dw-chain {
+    background: #0e0e18; border: 1px solid #1e1e2e; border-radius: 10px;
+    padding: 12px; position: relative; overflow: hidden;
+  }
+  .dw-chain-name {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; font-weight: 700;
+    margin-bottom: 10px; line-height: 1.3;
+  }
+  .dw-chain-drag {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    background: #1e1e2e; border-radius: 5px; padding: 5px 8px;
+    font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--muted);
+    cursor: not-allowed;
+  }
+  .dw-chain.is-free { border-color: rgba(34,197,94,0.3); }
+  .dw-chain.is-free .dw-chain-drag { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+
+  .demo-footer {
+    padding: 20px 28px 24px; border-top: 1px solid #1e1e2e;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap; flex-shrink: 0;
+  }
+  .demo-footer-note { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+  .demo-footer-note strong { color: var(--text); }
+  .demo-buy-btn {
+    background: linear-gradient(135deg, var(--accent), #9d4edd);
+    color: #fff; border: none; border-radius: 9px; padding: 13px 26px;
+    font-family: 'Space Mono', monospace; font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 0.05em; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(117,59,189,0.4);
+    transition: opacity 0.18s, transform 0.15s;
+  }
+  .demo-buy-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+  /* Demo visualizer */
+  .demo-viz-wrap {
+    position: relative; width: 100%; height: 110px;
+    border-radius: 8px; overflow: hidden; margin-bottom: 14px;
+    background: #0a0a0f;
+  }
+  .demo-viz-canvas { width: 100%; height: 100%; display: block; }
+  .demo-viz-overlay {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 7px 10px; pointer-events: none;
+  }
+  .demo-viz-status {
+    color: var(--accent2); font-family: 'Space Mono', monospace;
+    font-size: 0.6rem; letter-spacing: 0.08em;
+    text-shadow: 0 0 8px rgba(157,78,221,0.45);
+  }
+  .demo-viz-time { color: var(--muted); font-family: 'Space Mono', monospace; font-size: 0.6rem; }
+
+  /* Demo solo tooltip */
+  .dw-solo-tip {
+    position: fixed; z-index: 500;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    min-width: 190px;
+  }
+  .dw-solo-tip.visible { opacity: 1; }
+  .dw-solo-tip-row { display: flex; align-items: baseline; gap: 8px; line-height: 1.6; }
+  .dw-solo-tip-key {
+    font-family: 'Space Mono', monospace; font-size: 0.65rem;
+    background: rgba(117,59,189,0.18); border: 1px solid rgba(117,59,189,0.4);
+    border-radius: 4px; padding: 1px 5px; color: var(--accent);
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .dw-solo-tip-desc { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">URL2AUDIO</a>
+  <div class="nav-links">
+    <a href="#" onclick="openDemo();return false;">Desktop App</a>
+    <a href="#" class="nav-cta" onclick="startCheckout();return false;">Get App — $25</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge"><span>★</span> Free — No Account Required</div>
+  <h1>Detect <span>Key & Tempo</span><br>from any URL or File</h1>
+  <p>Pull audio from any URL, get your MP3 instantly — free, no account required.</p>
+</section>
+
+<!-- CONVERTER -->
+<div class="converter-wrap" id="converter">
+  <div class="converter-card">
+    <div class="input-group">
+      <input type="url" class="url-input" id="url-input"
+             placeholder="https://youtube.com/watch?v=..." autocomplete="off">
+      <button class="btn" id="submit-url-btn" onclick="submitUrl()">Convert</button>
+    </div>
+
+    <div class="divider">or upload a file</div>
+
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <div class="upload-icon">&#127925;</div>
+      <div>Drop an audio file here, or click to browse</div>
+      <div style="font-size:0.72rem;margin-top:5px;color:var(--muted)">MP3, WAV, FLAC, M4A, OGG &amp; more</div>
+      <input type="file" id="file-input" accept="audio/*,video/*" onchange="submitFile(this)">
+    </div>
+
+    <div style="text-align:center">
+      <span class="free-badge">&#10003; Free &nbsp;|&nbsp; MP3 output &nbsp;|&nbsp; Unlimited</span>
+    </div>
+
+    <div id="job-status">
+      <div class="status-row">
+        <div class="status-dot" id="status-dot"></div>
+        <div class="status-text" id="status-text">Processing...</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+      <div class="action-btns" id="action-btns">
+        <button class="btn dl-btn" id="download-btn">&#8595; Download MP3</button>
+      </div>
+
+      <div id="result-stats">
+        <div class="rs-track">
+          <img id="rs-art" class="rs-art" src="" alt="" style="display:none;">
+          <div class="rs-track-label" id="rs-track-label"></div>
+        </div>
+        <div class="rs-grid">
+          <div class="rs-stat">
+            <div class="rs-val key" id="rs-key">—</div>
+            <div class="rs-label">Key</div>
+          </div>
+          <div class="rs-stat">
+            <div class="rs-val" id="rs-camelot">—</div>
+            <div class="rs-label">Camelot</div>
+          </div>
+          <div class="rs-stat">
+            <div class="rs-val tempo" id="rs-tempo">—</div>
+            <div class="rs-label">BPM</div>
+          </div>
+          <div class="rs-stat">
+            <div class="rs-val" id="rs-confidence" style="font-size:1rem;color:var(--muted);">—</div>
+            <div class="rs-label">Confidence</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FL WORKFLOW BANNER -->
+<div class="fl-banner">
+  <div class="fl-banner-inner">
+    <div class="fl-icon">🎚️</div>
+    <div class="fl-banner-text">
+      <h3>FL Studio Workflow — Zero Setup</h3>
+      <p>Get the desktop app for <strong>one-click FL Studio auto-import</strong> — beat pre-loaded in the Sampler channel, tempo auto-set, and drag-and-drop vocal chains ready to go.</p>
+    </div>
+  </div>
+</div>
+
+<!-- VOCAL CHAINS -->
+<section class="section" id="chains">
+  <div class="section-label">Vocal Chains</div>
+  <h2>Industry Artist Presets</h2>
+  <div class="section-sub">37 FL Studio mixer presets modelled after real artist vocal chains. Unlock the full collection with the desktop app for drag-and-drop straight into your mixer.</div>
+
+  <div id="chains-loading" class="chains-loading">Loading chains...</div>
+  <div class="carousel-outer" id="carousel-outer" style="display:none">
+    <div class="carousel-track" id="carousel-track"></div>
+  </div>
+
+  <div class="chains-cta">
+    <p>Each preset is an FL Studio <code style="background:rgba(117,59,189,0.15);padding:2px 6px;border-radius:4px;font-size:0.82rem;">.fst</code> mixer file — drag it straight onto any mixer channel for instant sound. Full drag-and-drop from the app requires the desktop version.</p>
+    <button class="btn" onclick="startCheckout()">
+      Get Desktop App — $25
+    </button>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="section" id="download">
+  <div class="section-label">Plans</div>
+  <h2>Free vs Desktop App</h2>
+
+  <div class="compare-grid">
+    <div class="tier-card">
+      <div class="tier-name">Web Free</div>
+      <div class="tier-price">$0<span> / forever</span></div>
+      <div class="tier-sub">No account — convert above</div>
+      <ul class="feature-list">
+        <li><span class="check">&#10003;</span> URL to MP3</li>
+        <li><span class="check">&#10003;</span> File upload to MP3</li>
+        <li><span class="check">&#10003;</span> Unlimited conversions</li>
+        <li><span class="check">&#10003;</span> Key &amp; BPM detection</li>
+        <li class="dim"><span class="cross">—</span> WAV / FLAC export</li>
+        <li class="dim"><span class="cross">—</span> Stem separation</li>
+        <li class="dim"><span class="cross">—</span> LUFS loudness normalization</li>
+        <li class="dim"><span class="cross">—</span> One-click FL Studio auto-import</li>
+        <li class="dim"><span class="cross">—</span> Drag vocal chains to mixer</li>
+      </ul>
+      <div class="outline-btn">Already using it ↑</div>
+    </div>
+
+    <div class="tier-card featured">
+      <div class="tier-name">Desktop App</div>
+      <div class="tier-price">$25<span> one-time</span></div>
+      <div class="tier-sub">Windows, macOS &amp; Linux — own it forever</div>
+      <ul class="feature-list">
+        <li><span class="check">&#10003;</span> URL to MP3 / WAV / FLAC</li>
+        <li><span class="check">&#10003;</span> 4-stem &amp; 6-stem separation</li>
+        <li><span class="check">&#10003;</span> Key &amp; BPM detection</li>
+        <li><span class="check">&#10003;</span> LUFS loudness normalization</li>
+        <li><span class="check">&#10003;</span> Shazam metadata tagging</li>
+        <li><span class="check">&#10003;</span> One-click FL Studio auto-import</li>
+        <li><span class="check">&#10003;</span> Drag vocal chains to FL mixer</li>
+        <li><span class="check">&#10003;</span> 37 artist vocal chain presets</li>
+        <li><span class="check">&#10003;</span> GPU acceleration (CUDA / MPS)</li>
+        <li><span class="check">&#10003;</span> Unlimited use, offline</li>
+      </ul>
+      <button class="btn buy-btn" id="buy-btn" onclick="startCheckout()">Buy Now — $25</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>URL2AUDIO &copy; 2025</span>
+  <div style="display:flex;gap:20px;align-items:center;">
+    <a href="#" onclick="openDemo();return false;">Desktop App</a>
+    <a href="#chains">Vocal Chains</a>
+    <a href="/founders">Founders</a>
+    <a href="#" onclick="document.getElementById('terms-overlay').classList.add('open');return false;">Terms of Service</a>
+  </div>
+</footer>
+
+<!-- Coming Soon Modal -->
+<div class="soon-overlay" id="soon-overlay" onclick="if(event.target===this)closeSoon()">
+  <div class="soon-modal">
+    <button class="soon-close" onclick="closeSoon()">✕</button>
+    <div class="soon-icon">🚀</div>
+    <h2>Coming Soon</h2>
+    <p>The desktop app is almost ready.<br>Check back soon for the full release — stem separation, FL Studio integration, and vocal chains.</p>
+    <button class="btn" style="width:100%;padding:13px;" onclick="closeSoon()">Got it</button>
+  </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="terms-overlay" id="terms-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="terms-modal">
+    <button class="terms-close" onclick="document.getElementById('terms-overlay').classList.remove('open')">&times;</button>
+    <h2>// Terms of Service</h2>
+    <p style="margin-bottom:16px;font-size:0.68rem;">Last updated: May 2025</p>
+
+    <h3>1. Acceptance</h3>
+    <p>By using URL2AUDIO you agree to these terms. If you do not agree, do not use the service.</p>
+
+    <h3>2. Your Content Responsibility</h3>
+    <p>You are solely responsible for content you process. By submitting a URL or file you confirm:</p>
+    <ul>
+      <li>You have the legal right to download or convert the content.</li>
+      <li>Your use does not infringe any copyright or intellectual property rights.</li>
+      <li>You will not reproduce or distribute commercially released music without the rights holder's permission.</li>
+    </ul>
+
+    <h3>3. Free Tier Limits</h3>
+    <p>The free web converter is rate-limited. We may adjust limits or require account creation at any time.</p>
+
+    <h3>4. Payments &amp; Refunds</h3>
+    <p>The desktop application is a one-time purchase. All sales are final. Vocal chain purchases are non-refundable once delivered.</p>
+
+    <h3>5. No Warranty</h3>
+    <p>URL2AUDIO is provided "as is" without warranty of any kind. We do not guarantee uptime, accuracy of detection results, or fitness for any particular purpose.</p>
+
+    <h3>6. Limitation of Liability</h3>
+    <p>URL2AUDIO and its founders are not liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
+
+    <h3>7. Changes</h3>
+    <p>We may update these Terms at any time. Continued use constitutes acceptance of the revised Terms.</p>
+
+    <h3>8. Contact</h3>
+    <p>Questions? Visit the <a href="/founders" style="color:var(--accent2);">Founders</a> page.</p>
+  </div>
+</div>
+
+<!-- ── APP DEMO MODAL ──────────────────────────────────────────────── -->
+<div class="demo-overlay" id="demo-overlay" onclick="if(event.target===this)closeDemo()">
+  <div class="demo-modal">
+
+    <div class="demo-header">
+      <div class="demo-header-left">
+        <span class="demo-badge">Preview</span>
+        <span class="demo-title-text">Desktop App</span>
+      </div>
+      <button class="demo-close" onclick="closeDemo()">✕</button>
+    </div>
+
+    <div class="demo-tabs" id="demo-tabs">
+      <button class="demo-tab active" onclick="showDemoTab(0)">Key &amp; BPM</button>
+      <button class="demo-tab" onclick="showDemoTab(1)">Stem Separation</button>
+      <button class="demo-tab" onclick="showDemoTab(2)">FL Studio</button>
+      <button class="demo-tab" onclick="showDemoTab(3)">Vocal Chains</button>
+    </div>
+
+    <div class="demo-body">
+
+      <!-- Tab 0: Key & BPM -->
+      <div class="demo-screen active" id="dscreen-0">
+        <div class="dw-card">
+          <div class="dw-label">Analysis Result — C#Minor Vibes (demo)</div>
+          <div class="dw-stat-row">
+            <div class="dw-stat">
+              <div class="dw-stat-val accent">C# Min</div>
+              <div class="dw-stat-key">Key</div>
+            </div>
+            <div class="dw-stat">
+              <div class="dw-stat-val orange">142</div>
+              <div class="dw-stat-key">BPM</div>
+            </div>
+            <div class="dw-stat">
+              <div class="dw-stat-val" style="font-size:1rem;padding-top:4px;">
+                <span style="color:#22c55e">12B</span>
+                <span style="font-size:0.7rem;color:var(--muted);margin-left:4px;">Camelot</span>
+              </div>
+              <div class="dw-stat-key">Scale</div>
+            </div>
+          </div>
+        </div>
+        <div class="dw-card">
+          <div class="dw-label">Confidence</div>
+          <div class="dw-progress"><div class="dw-progress-fill" id="conf-bar" style="width:0%"></div></div>
+          <div style="display:flex;justify-content:space-between;font-family:'Space Mono',monospace;font-size:0.72rem;color:var(--muted)">
+            <span>Key match strength</span><span style="color:#fff">89%</span>
+          </div>
+        </div>
+        <div class="dw-card">
+          <div class="dw-label">LUFS Loudness &amp; Format</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="dw-stat" style="flex:1;min-width:120px;">
+              <div class="dw-stat-val" style="font-size:1rem;">−8.3</div>
+              <div class="dw-stat-key">Integrated LUFS</div>
+            </div>
+            <div class="dw-stat" style="flex:1;min-width:120px;">
+              <div class="dw-stat-val" style="font-size:1rem;color:#22c55e">WAV</div>
+              <div class="dw-stat-key">Export Format</div>
+            </div>
+            <div class="dw-stat" style="flex:1;min-width:120px;">
+              <div class="dw-stat-val" style="font-size:1rem;color:#22c55e">FLAC</div>
+              <div class="dw-stat-key">Also Available</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Stem Separation -->
+      <div class="demo-screen" id="dscreen-1">
+        <div class="dw-card">
+          <div class="dw-label">Stem Mixer — 4-track separation (demo)</div>
+          <div class="demo-viz-wrap">
+            <canvas id="demo-viz" class="demo-viz-canvas"></canvas>
+            <div class="demo-viz-overlay">
+              <div class="demo-viz-status">Analyzing audio frequencies...</div>
+              <div class="demo-viz-time">0:32 / 3:47</div>
+            </div>
+          </div>
+          <div class="dw-stems" id="demo-stems"></div>
+        </div>
+        <div class="dw-card">
+          <div class="dw-label">6-Stem Mode — also available</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Vocals</span>
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Drums</span>
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Bass</span>
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Guitar</span>
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Piano</span>
+            <span style="background:#1e1e2e;border-radius:6px;padding:5px 11px;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--muted)">Other</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: FL Studio -->
+      <div class="demo-screen" id="dscreen-2">
+        <div class="dw-card">
+          <div class="dw-label">One-click FL Studio workflow (demo)</div>
+          <div class="dw-fl-steps">
+            <div class="dw-fl-step">
+              <div class="dw-step-num">1</div>
+              <div class="dw-step-body">
+                <div class="dw-step-title">Load Beat into FL Studio</div>
+                <div class="dw-step-desc">Opens your recording template with the beat pre-loaded in the Sampler channel. Tempo auto-set to <strong style="color:#e86c00">142 BPM</strong>.</div>
+                <span class="dw-step-demo-btn">▶ Open Beat in FL Studio</span>
+              </div>
+            </div>
+            <div class="dw-fl-step">
+              <div class="dw-step-num">2</div>
+              <div class="dw-step-body">
+                <div class="dw-step-title">Set Pitch Correction Key</div>
+                <div class="dw-step-desc">In <strong>Pitcher</strong> or <strong>NewTone</strong>, set the scale to <strong style="color:#9d4edd">C# Minor · 12B</strong>. Your vocal is tuned to the beat's key automatically.</div>
+              </div>
+            </div>
+            <div class="dw-fl-step">
+              <div class="dw-step-num">3</div>
+              <div class="dw-step-body">
+                <div class="dw-step-title">Drag a Vocal Chain</div>
+                <div class="dw-step-desc">Pick a preset from the Store tab and drag it onto your vocal mixer channel for instant industry sound.</div>
+                <span class="dw-step-demo-btn">Open Store →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Vocal Chains -->
+      <div class="demo-screen" id="dscreen-3">
+        <div class="dw-card">
+          <div class="dw-label">Vocal chain store — drag-and-drop into FL mixer (demo)</div>
+          <div class="dw-chain-grid" id="demo-chains"></div>
+        </div>
+      </div>
+
+    </div><!-- /demo-body -->
+
+    <div class="demo-footer">
+      <div class="demo-footer-note">
+        <strong>$25 one-time</strong> — Windows, macOS &amp; Linux.<br>
+        Own it forever.
+      </div>
+      <button class="demo-buy-btn" onclick="closeDemo();startCheckout()">Get Desktop App — $25</button>
+    </div>
+
+  </div><!-- /demo-modal -->
+</div><!-- /demo-overlay -->
+
+<script>
+  let currentJobId = null;
+  let pollTimer    = null;
+
+  // drag & drop upload
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f) submitFile(null, f);
+  });
+
+  document.getElementById('url-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitUrl();
+  });
+
+  function submitUrl() {
+    const url = document.getElementById('url-input').value.trim();
+    if (!url) return;
+    setLoading(true);
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ url, format: 'mp3', stems: 'none' })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { showError(data.error); setLoading(false); return; }
+      startPolling(data.job_id);
+    })
+    .catch(e => { showError(e.message); setLoading(false); });
+  }
+
+  function submitFile(input, file) {
+    const f = file || (input && input.files[0]);
+    if (!f) return;
+    zone.querySelector('div:nth-child(2)').textContent = f.name;
+    setLoading(true);
+    const fd = new FormData();
+    fd.append('file', f); fd.append('format', 'mp3'); fd.append('stems', 'none');
+    fetch('/api/submit-file', { method: 'POST', body: fd })
+    .then(r => r.json())
+    .then(data => {
+      if (data.error) { showError(data.error); setLoading(false); return; }
+      startPolling(data.job_id);
+    })
+    .catch(e => { showError(e.message); setLoading(false); });
+  }
+
+  function startPolling(jobId) {
+    currentJobId = jobId;
+    showStatus();
+    pollTimer = setInterval(() => poll(jobId), 1500);
+  }
+
+  const STAGE_PROGRESS = {
+    queued: '10%', downloading: '25%', converting: '40%',
+    metadata: '55%', analyzing: '65%', encoding: '80%',
+    separating: '88%', processing: '60%'
+  };
+
+  function poll(jobId) {
+    fetch('/api/status/' + jobId)
+    .then(r => r.json())
+    .then(data => {
+      const dot  = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      const fill = document.getElementById('progress-fill');
+      text.textContent = data.message || data.status;
+      if (STAGE_PROGRESS[data.status]) fill.style.width = STAGE_PROGRESS[data.status];
+      if (data.status === 'done') {
+        clearInterval(pollTimer);
+        fill.style.width = '100%';
+        dot.className = 'status-dot done';
+        text.textContent = data.filename || 'Done!';
+        const dlBtn = document.getElementById('download-btn');
+        dlBtn.onclick = () => { window.location = '/api/download/' + jobId; };
+        document.getElementById('action-btns').classList.add('show');
+
+        // Show key / tempo / album art
+        const track = data.metadata || {};
+        const artEl = document.getElementById('rs-art');
+        if (track.album_art_url) {
+          artEl.src = track.album_art_url;
+          artEl.style.display = 'block';
+        } else {
+          artEl.style.display = 'none';
+        }
+        const trackLabel = [track.artist, track.title].filter(Boolean).join(' — ');
+        document.getElementById('rs-track-label').textContent = trackLabel;
+        document.querySelector('.rs-track').style.display = (trackLabel || track.album_art_url) ? 'flex' : 'none';
+        document.getElementById('rs-key').textContent        = data.key      || '—';
+        document.getElementById('rs-camelot').textContent    = data.camelot  || '—';
+        document.getElementById('rs-tempo').textContent      = data.tempo    || '—';
+        document.getElementById('rs-confidence').textContent = data.confidence != null ? data.confidence + '%' : '—';
+        document.getElementById('result-stats').style.display = 'block';
+
+        setLoading(false);
+      }
+      if (data.status === 'error') {
+        clearInterval(pollTimer);
+        dot.className = 'status-dot error';
+        showError(data.message || 'Conversion failed');
+        setLoading(false);
+      }
+    })
+    .catch(() => {
+      clearInterval(pollTimer);
+      showError('Lost connection — please refresh and try again.');
+      setLoading(false);
+    });
+  }
+
+  function setLoading(on) {
+    document.getElementById('submit-url-btn').disabled = on;
+  }
+
+  function showStatus() {
+    document.getElementById('job-status').style.display = 'block';
+    document.getElementById('error-msg').style.display = 'none';
+    document.getElementById('action-btns').classList.remove('show');
+    document.getElementById('result-stats').style.display = 'none';
+    document.getElementById('progress-fill').style.width = '5%';
+    document.getElementById('status-dot').className = 'status-dot';
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById('job-status').style.display = 'block';
+  }
+
+  function startCheckout() {
+    document.getElementById('soon-overlay').classList.add('open');
+  }
+  function closeSoon() {
+    document.getElementById('soon-overlay').classList.remove('open');
+  }
+
+  // ── APP DEMO MODAL ───────────────────────────────────────────────────────
+
+  let demoTab = 0;
+  let demoChainsLoaded = false;
+
+  const DEMO_STEMS = [
+    { name: 'Vocals',  color: '#9d4edd', heights: [14,22,18,26,20,16,24,19,22,18,14,20,26,18,22,16,20,24,18,22] },
+    { name: 'Drums',   color: '#e86c00', heights: [26,10,26,10,26,10,26,10,26,10,26,10,26,10,26,10,26,10,26,10] },
+    { name: 'Bass',    color: '#06b6d4', heights: [20,22,18,20,22,18,20,22,18,20,22,18,20,22,18,20,22,18,20,22] },
+    { name: 'Other',   color: '#22c55e', heights: [12,14,16,14,12,16,18,16,14,12,14,16,18,14,12,16,14,18,16,12] },
+  ];
+
+  function openDemo() {
+    document.getElementById('demo-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    showDemoTab(0);
+    if (!demoChainsLoaded) buildDemoChains();
+    // animate the confidence bar
+    setTimeout(() => {
+      const bar = document.getElementById('conf-bar');
+      if (bar) bar.style.width = '89%';
+    }, 300);
+  }
+
+  function closeDemo() {
+    document.getElementById('demo-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+    if (demoVizRaf) { cancelAnimationFrame(demoVizRaf); demoVizRaf = null; }
+    document.getElementById('dw-solo-tip').classList.remove('visible');
+  }
+
+  function showDemoTab(idx) {
+    demoTab = idx;
+    document.querySelectorAll('.demo-tab').forEach((t, i) =>
+      t.classList.toggle('active', i === idx));
+    document.querySelectorAll('.demo-screen').forEach((s, i) =>
+      s.classList.toggle('active', i === idx));
+    if (idx === 1) { buildDemoStems(); if (!demoVizRaf) startDemoVisualizer(); }
+  }
+
+  let demoVizRaf = null;
+
+  function buildDemoStems() {
+    const el = document.getElementById('demo-stems');
+    if (!el || el.children.length) return;
+    el.innerHTML = DEMO_STEMS.map(s => `
+      <div class="dw-stem">
+        <div class="dw-stem-dot" style="background:${s.color}"></div>
+        <div class="dw-stem-name" style="color:${s.color}">${s.name}</div>
+        <div class="dw-stem-wave">
+          ${s.heights.map(h =>
+            `<div class="dw-stem-bar" style="height:${h}px;color:${s.color};background:${s.color}"></div>`
+          ).join('')}
+        </div>
+        <div class="dw-stem-ctrl">
+          <span class="dw-stem-btn">MUTE</span>
+          <span class="dw-stem-btn dw-solo-btn">SOLO</span>
+        </div>
+      </div>`).join('');
+
+    // Attach solo tooltip to each SOLO button
+    const tip = document.getElementById('dw-solo-tip');
+    el.querySelectorAll('.dw-solo-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const rect = btn.getBoundingClientRect();
+        tip.style.left = rect.left + 'px';
+        tip.style.top = (rect.top - tip.offsetHeight - 8) + 'px';
+        tip.classList.add('visible');
+      });
+      btn.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+    });
+
+  }
+
+  function startDemoVisualizer() {
+    const canvas = document.getElementById('demo-viz');
+    if (!canvas || demoVizRaf) return;
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width  = rect.width  || canvas.parentElement.offsetWidth || 320;
+      canvas.height = rect.height || 110;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const BAR_COUNT = 52;
+    let t = 0;
+
+    function draw() {
+      demoVizRaf = requestAnimationFrame(draw);
+      t += 0.022;
+
+      const W = canvas.width;
+      const H = canvas.height;
+      const barW = W / BAR_COUNT;
+
+      ctx.fillStyle = 'rgba(10,10,15,0.18)';
+      ctx.fillRect(0, 0, W, H);
+
+      // First pass: bars without glow
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const freq = i / BAR_COUNT;
+        const amp = Math.max(0, Math.min(1,
+          (1 - freq * 1.3) * 0.52 +
+          Math.sin(t * 3.0 + i * 0.44) * 0.18 +
+          Math.sin(t * 1.7 + i * 0.88) * 0.14 + 0.09
+        ));
+        const hue = 265 + freq * 70;
+        ctx.fillStyle = `hsla(${hue},75%,55%,${0.4 + amp * 0.6})`;
+        ctx.fillRect(i * barW, H - amp * H * 0.80, barW - 1, amp * H * 0.80);
+      }
+
+      // Second pass: top-cap glow on tall bars only
+      ctx.shadowBlur = 5;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const freq = i / BAR_COUNT;
+        const amp = Math.max(0, Math.min(1,
+          (1 - freq * 1.3) * 0.52 +
+          Math.sin(t * 3.0 + i * 0.44) * 0.18 +
+          Math.sin(t * 1.7 + i * 0.88) * 0.14 + 0.09
+        ));
+        if (amp > 0.45) {
+          const hue = 265 + freq * 70;
+          ctx.shadowColor = `hsla(${hue},80%,65%,0.7)`;
+          ctx.fillStyle = `hsla(${hue},80%,65%,0.9)`;
+          ctx.fillRect(i * barW, H - amp * H * 0.80, barW - 1, 2);
+        }
+      }
+      ctx.shadowBlur = 0;
+
+      ctx.beginPath();
+      for (let x = 0; x < W; x += 2) {
+        const y = H / 2 +
+          Math.sin(x * 0.055 + t * 2.1) * H * 0.20 +
+          Math.sin(x * 0.090 + t * 1.1) * H * 0.09;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'hsla(290,80%,72%,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.shadowColor = 'hsla(290,80%,72%,0.45)';
+      ctx.shadowBlur = 7;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    draw();
+  }
+
+  function buildDemoChains() {
+    demoChainsLoaded = true;
+    fetch('/api/chains')
+      .then(r => r.json())
+      .then(chains => {
+        const el = document.getElementById('demo-chains');
+        if (!el) return;
+        el.innerHTML = chains.slice(0, 9).map(c => `
+          <div class="dw-chain ${c.free ? 'is-free' : ''}">
+            <div class="dw-chain-name" style="color:${c.color}">${c.name}</div>
+            <div class="dw-chain-drag">⠿ ${c.free ? 'Download Free' : 'Drag to Mixer'}</div>
+          </div>`).join('');
+      })
+      .catch(() => {});
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDemo(); });
+
+  // Load vocal chain catalog
+  function loadChains() {
+    fetch('/api/chains')
+    .then(r => r.json())
+    .then(chains => renderChains(chains))
+    .catch(() => {
+      const track = document.getElementById('carousel-track');
+      if (track) track.innerHTML = '<div class="chains-loading">Could not load chains.</div>';
+    });
+  }
+
+  function renderChains(chains) {
+    const track = document.getElementById('carousel-track');
+    const makeCard = c => {
+      const isFree    = c.free;
+      const price     = isFree ? 'FREE' : '$' + c.price.toFixed(2);
+      const priceClass= isFree ? 'chain-free-price' : 'chain-paid-price';
+      const btn       = `<button class="chain-app-btn" onclick="startCheckout()">In App Purchase</button>`;
+      return `<div class="chain-card">
+        <div class="chain-card-name" style="color:${c.color}">${c.name}</div>
+        <div class="chain-card-foot">
+          <span class="chain-card-price ${priceClass}">${price}</span>
+          ${btn}
+        </div>
+      </div>`;
+    };
+    // Duplicate for seamless infinite loop
+    const html = chains.map(makeCard).join('');
+    track.innerHTML = html + html;
+    document.getElementById('chains-loading').style.display = 'none';
+    document.getElementById('carousel-outer').style.display = 'block';
+  }
+
+  loadChains();
+</script>
+
+<!-- Demo solo tooltip -->
+<div class="dw-solo-tip" id="dw-solo-tip">
+  <div class="dw-solo-tip-row">
+    <span class="dw-solo-tip-key">Click</span>
+    <span class="dw-solo-tip-desc">Exclusive solo</span>
+  </div>
+  <div class="dw-solo-tip-row">
+    <span class="dw-solo-tip-key">Shift+Click</span>
+    <span class="dw-solo-tip-desc">Add / remove from solo</span>
+  </div>
+</div>
+</body>
+</html>
