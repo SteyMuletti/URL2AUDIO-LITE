@@ -1211,7 +1211,6 @@ def download(job_id):
     filepath = job.get("filepath")
     if not filepath or not Path(filepath).is_file():
         return jsonify({"error": "Output file is missing from disk"}), 500
-    _copy_to_downloads(filepath, job["filename"])
     return send_file(
         filepath,
         as_attachment=True,
@@ -1249,7 +1248,6 @@ def download_stems(job_id):
         return jsonify({"error": "No stem package available for this job"}), 404
     if not Path(stems_path).is_file():
         return jsonify({"error": "Stem package is missing from disk"}), 500
-    _copy_to_downloads(stems_path, stems_name)
     return send_file(stems_path, as_attachment=True, download_name=stems_name, mimetype="application/zip")
 
 
@@ -1725,6 +1723,26 @@ def cleanup():
             pass
 
 threading.Thread(target=cleanup, daemon=True).start()
+
+WAITLIST_FILE = Path(__file__).parent / "waitlist.csv"
+
+
+@app.route("/api/waitlist", methods=["POST"])
+def waitlist():
+    data  = request.get_json(force=True)
+    email = (data.get("email") or "").strip().lower()
+    if not email or "@" not in email or "." not in email.split("@")[-1]:
+        return jsonify({"error": "Invalid email"}), 400
+    existed = WAITLIST_FILE.exists()
+    with WAITLIST_FILE.open("a", newline="", encoding="utf-8") as f:
+        if not existed:
+            f.write("email,signed_up_at\n")
+        import csv as _csv
+        w = _csv.writer(f)
+        from datetime import datetime as _dt
+        w.writerow([email, _dt.utcnow().isoformat()])
+    return jsonify({"ok": True})
+
 
 if __name__ == "__main__":
     host = os.getenv("URL2AUDIO_HOST", "0.0.0.0").strip() or "0.0.0.0"

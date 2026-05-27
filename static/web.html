@@ -172,9 +172,9 @@
   .action-btns.show { display: flex; }
 
   #result-stats { display: none; margin-top: 20px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; }
-  .rs-track { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .rs-track { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; overflow: hidden; }
   .rs-art { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-  .rs-track-label { font-family: 'Space Mono', monospace; font-size: 0.74rem; color: var(--muted); line-height: 1.5; }
+  .rs-track-label { font-family: 'Space Mono', monospace; font-size: 0.74rem; color: var(--muted); line-height: 1.5; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .rs-grid { display: flex; gap: 28px; flex-wrap: wrap; }
   .rs-stat { display: flex; flex-direction: column; gap: 4px; }
   .rs-val { font-size: 1.6rem; font-weight: 800; line-height: 1; }
@@ -300,8 +300,10 @@
     width: 100%; padding: 12px; background: transparent;
     border: 1px solid var(--border); border-radius: 8px; color: var(--muted);
     font-family: 'Space Mono', monospace; font-size: 0.8rem; font-weight: 700;
-    cursor: default; letter-spacing: 0.03em; text-align: center;
+    letter-spacing: 0.03em; text-align: center;
+    transition: border-color 0.2s, color 0.2s;
   }
+  .outline-btn:hover { border-color: var(--accent); color: var(--text); }
   .buy-btn { width: 100%; padding: 14px; font-size: 0.88rem; cursor: pointer; }
 
   /* FL WORKFLOW BANNER */
@@ -357,6 +359,34 @@
     font-size: 1.2rem; cursor: pointer; line-height: 1;
   }
   .soon-close:hover { color: var(--text); }
+  .soon-offer {
+    background: rgba(117,59,189,0.12); border: 1px solid rgba(117,59,189,0.3);
+    border-radius: 8px; padding: 10px 14px;
+    font-family: 'Space Mono', monospace; font-size: 0.78rem;
+    color: var(--accent2); margin-bottom: 18px; line-height: 1.5;
+  }
+  .soon-offer strong { color: #fff; }
+  .soon-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
+  .soon-email-input {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Space Mono', monospace; font-size: 0.82rem;
+    padding: 11px 14px; outline: none; transition: border-color 0.2s;
+  }
+  .soon-email-input:focus { border-color: var(--accent); }
+  .soon-email-input::placeholder { color: var(--muted); }
+  .soon-submit-btn { white-space: nowrap; padding: 11px 18px; }
+  .soon-error {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    color: var(--error); min-height: 18px; margin-bottom: 4px;
+  }
+  .soon-skip {
+    background: none; border: none; color: var(--muted);
+    font-family: 'Space Mono', monospace; font-size: 0.72rem;
+    cursor: pointer; margin-top: 8px; text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .soon-skip:hover { color: var(--text); }
 
   /* Terms modal */
   .terms-overlay {
@@ -736,12 +766,16 @@
         <li><span class="check">&#10003;</span> Unlimited conversions</li>
         <li><span class="check">&#10003;</span> Key &amp; BPM detection</li>
         <li class="dim"><span class="cross">—</span> WAV / FLAC export</li>
-        <li class="dim"><span class="cross">—</span> Stem separation</li>
+        <li class="dim"><span class="cross">—</span> 4-stem &amp; 6-stem separation</li>
         <li class="dim"><span class="cross">—</span> LUFS loudness normalization</li>
+        <li class="dim"><span class="cross">—</span> Shazam metadata tagging</li>
         <li class="dim"><span class="cross">—</span> One-click FL Studio auto-import</li>
-        <li class="dim"><span class="cross">—</span> Drag vocal chains to mixer</li>
+        <li class="dim"><span class="cross">—</span> Drag vocal chains to FL mixer</li>
+        <li class="dim"><span class="cross">—</span> 37 artist vocal chain presets</li>
+        <li class="dim"><span class="cross">—</span> GPU acceleration (CUDA / MPS)</li>
+        <li class="dim"><span class="cross">—</span> Unlimited use, offline</li>
       </ul>
-      <div class="outline-btn">Already using it ↑</div>
+      <a class="outline-btn" href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;" style="display:block;text-decoration:none;cursor:pointer;">Already using it ↑</a>
     </div>
 
     <div class="tier-card featured">
@@ -750,8 +784,11 @@
       <div class="tier-sub">Windows, macOS &amp; Linux — own it forever</div>
       <ul class="feature-list">
         <li><span class="check">&#10003;</span> URL to MP3 / WAV / FLAC</li>
-        <li><span class="check">&#10003;</span> 4-stem &amp; 6-stem separation</li>
+        <li><span class="check">&#10003;</span> File upload to MP3 / WAV / FLAC</li>
+        <li><span class="check">&#10003;</span> Unlimited conversions</li>
         <li><span class="check">&#10003;</span> Key &amp; BPM detection</li>
+        <li><span class="check">&#10003;</span> WAV / FLAC export</li>
+        <li><span class="check">&#10003;</span> 4-stem &amp; 6-stem separation</li>
         <li><span class="check">&#10003;</span> LUFS loudness normalization</li>
         <li><span class="check">&#10003;</span> Shazam metadata tagging</li>
         <li><span class="check">&#10003;</span> One-click FL Studio auto-import</li>
@@ -779,10 +816,28 @@
 <div class="soon-overlay" id="soon-overlay" onclick="if(event.target===this)closeSoon()">
   <div class="soon-modal">
     <button class="soon-close" onclick="closeSoon()">✕</button>
-    <div class="soon-icon">🚀</div>
-    <h2>Coming Soon</h2>
-    <p>The desktop app is almost ready.<br>Check back soon for the full release — stem separation, FL Studio integration, and vocal chains.</p>
-    <button class="btn" style="width:100%;padding:13px;" onclick="closeSoon()">Got it</button>
+
+    <!-- Default state -->
+    <div id="soon-default">
+      <div class="soon-icon">🚀</div>
+      <h2>Coming Soon</h2>
+      <p>The desktop app is almost ready — stem separation, FL Studio integration, and 37 vocal chains.</p>
+      <div class="soon-offer">Get <strong>10% off</strong> at launch — enter your email for early access.</div>
+      <div class="soon-input-row">
+        <input type="email" id="soon-email" class="soon-email-input" placeholder="your@email.com" autocomplete="email">
+        <button class="btn soon-submit-btn" onclick="submitWaitlist()">Notify Me</button>
+      </div>
+      <div class="soon-error" id="soon-error"></div>
+      <button class="soon-skip" onclick="closeSoon()">No thanks, just browsing</button>
+    </div>
+
+    <!-- Success state -->
+    <div id="soon-success" style="display:none">
+      <div class="soon-icon">✅</div>
+      <h2>You're on the list!</h2>
+      <p>We'll email you your <strong>10% off</strong> code the moment the app drops.</p>
+      <button class="btn" style="width:100%;padding:13px;" onclick="closeSoon()">Got it</button>
+    </div>
   </div>
 </div>
 
@@ -1107,11 +1162,39 @@
   }
 
   function startCheckout() {
+    document.getElementById('soon-default').style.display = '';
+    document.getElementById('soon-success').style.display = 'none';
+    document.getElementById('soon-email').value = '';
+    document.getElementById('soon-error').textContent = '';
     document.getElementById('soon-overlay').classList.add('open');
   }
   function closeSoon() {
     document.getElementById('soon-overlay').classList.remove('open');
   }
+  function submitWaitlist() {
+    const email = document.getElementById('soon-email').value.trim();
+    const errEl = document.getElementById('soon-error');
+    if (!email || !email.includes('@')) {
+      errEl.textContent = 'Please enter a valid email.';
+      return;
+    }
+    errEl.textContent = '';
+    fetch('/api/waitlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+    .then(r => r.json())
+    .then(d => {
+      if (d.error) { errEl.textContent = d.error; return; }
+      document.getElementById('soon-default').style.display = 'none';
+      document.getElementById('soon-success').style.display = '';
+    })
+    .catch(() => { errEl.textContent = 'Something went wrong — try again.'; });
+  }
+  document.getElementById('soon-email')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitWaitlist();
+  });
 
   // ── APP DEMO MODAL ───────────────────────────────────────────────────────
 
