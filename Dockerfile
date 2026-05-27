@@ -9,6 +9,5 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-RUN printf '#!/bin/sh\nexec gunicorn server:app --workers 2 --timeout 300 --bind "0.0.0.0:${PORT:-8000}"\n' > /start.sh && chmod +x /start.sh
 
-CMD ["/start.sh"]
+CMD ["gunicorn", "server:app", "--config", "gunicorn.conf.py"]
