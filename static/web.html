@@ -6,6 +6,7 @@
 <title>URL2AUDIO — Free URL to MP3 Converter</title>
 <meta name="description" content="Convert any URL or audio file to MP3 instantly, free. Get the desktop app for stem separation, WAV/FLAC, key & BPM detection, and industry vocal chains.">
 <link rel="icon" type="image/png" href="/static/icon.png">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
@@ -822,7 +823,7 @@
       <div class="soon-icon">🚀</div>
       <h2>Coming Soon</h2>
       <p>The desktop app is almost ready — stem separation, FL Studio integration, and 37 vocal chains.</p>
-      <div class="soon-offer">Get <strong>10% off</strong> at launch — enter your email for early access.</div>
+      <div class="soon-offer">Enter your email for <strong>beta access</strong> — be the first to try it when it drops.</div>
       <div class="soon-input-row">
         <input type="email" id="soon-email" class="soon-email-input" placeholder="your@email.com" autocomplete="email">
         <button class="btn soon-submit-btn" onclick="submitWaitlist()">Notify Me</button>
@@ -835,7 +836,7 @@
     <div id="soon-success" style="display:none">
       <div class="soon-icon">✅</div>
       <h2>You're on the list!</h2>
-      <p>We'll email you your <strong>10% off</strong> code the moment the app drops.</p>
+      <p>We'll reach out with <strong>beta access</strong> the moment the app drops.</p>
       <button class="btn" style="width:100%;padding:13px;" onclick="closeSoon()">Got it</button>
     </div>
   </div>
@@ -1189,6 +1190,7 @@
       if (d.error) { errEl.textContent = d.error; return; }
       document.getElementById('soon-default').style.display = 'none';
       document.getElementById('soon-success').style.display = '';
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.55 }, colors: ['#753BBD','#9d4edd','#e040fb','#fff','#22c55e'], zIndex: 1000 });
     })
     .catch(() => { errEl.textContent = 'Something went wrong — try again.'; });
   }
