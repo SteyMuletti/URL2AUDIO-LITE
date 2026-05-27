@@ -1733,14 +1733,16 @@ def waitlist():
     email = (data.get("email") or "").strip().lower()
     if not email or "@" not in email or "." not in email.split("@")[-1]:
         return jsonify({"error": "Invalid email"}), 400
+    from datetime import datetime as _dt
+    import csv as _csv
+    signed_up_at = _dt.utcnow().isoformat()
     existed = WAITLIST_FILE.exists()
     with WAITLIST_FILE.open("a", newline="", encoding="utf-8") as f:
         if not existed:
             f.write("email,signed_up_at\n")
-        import csv as _csv
         w = _csv.writer(f)
-        from datetime import datetime as _dt
-        w.writerow([email, _dt.utcnow().isoformat()])
+        w.writerow([email, signed_up_at])
+    print(f"[WAITLIST] {email} {signed_up_at}", flush=True)
     return jsonify({"ok": True})
 
 
