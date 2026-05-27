@@ -27,7 +27,7 @@ DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
 LOW_RESOURCE_MODE = os.getenv("LOW_RESOURCE_MODE", "0").strip() not in ("0", "false", "False")
 MAX_STEM_SECONDS = int(os.getenv("MAX_STEM_SECONDS", "600"))
 DEMUCS_DEVICE         = os.getenv("DEMUCS_DEVICE", "cuda").strip().lower()
-FREE_TIER             = os.getenv("FREE_TIER", "0").strip() not in ("0", "false", "False")
+FREE_TIER             = os.getenv("FREE_TIER", "1").strip() not in ("0", "false", "False")
 _dev_tier_override: "bool | None" = None  # toggled at runtime for dev testing
 
 def is_free_tier() -> bool:
