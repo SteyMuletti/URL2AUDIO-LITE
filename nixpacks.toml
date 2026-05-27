@@ -1,6 +1,0 @@
-[phases.setup]
-nixPkgs = ["python311"]
-aptPkgs = ["ffmpeg", "libsndfile1"]
-
-[start]
-cmd = "gunicorn server:app --workers 2 --timeout 300 --bind 0.0.0.0:$PORT"
